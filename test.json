@@ -1,0 +1,12 @@
+{
+  "INIT":{"type":0,"story":"hi","choices":["Die!","DIE","Win?","WIN","choice3","merp","choice4","ehh"]},
+  "merp":{"type":-1,"var":"mep","set":"Hi","then":"merps"},
+  "merps":{"type":1,"story":{"if":"mep","is":"Hi","then":"wow","else":"wat"},"then":"hi"},
+  "hi":{"type":1,"story":{"text":"best animal: %s a percent: %% something useless: %p and value of mep: %v","replace":["sheep","mep"]},"then":"WIN"},
+  "ehh":{"type":-1,"var":"mep","set":"2","then":"eh"},
+  "eh":{"type":2,"story":"your number?","add":"mep","then":"lol"},
+  "lol":{"type":3,"story":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
+  "report":{"type":1,"story":{"text":"%v","replace":["mep"]},"then":"WIN"},
+  "DIE":"you ded",
+  "WIN":"you live"
+}

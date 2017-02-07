@@ -1,0 +1,15 @@
+<svg viewBox="-1 -1 142 32" xmlns="http://www.w3.org/2000/svg" stroke="black" stroke-width="2" fill='none'>
+  <path fill="white" d="M0 0H140v10h-10V30H90V20H80V30H70V10H60V30H10V10H0z"/>
+  <path d="
+    M20 0V30z
+    M30 0V10z
+    M30 20V30z
+    M40 0V30z
+    M50 10h40z
+    M50 20h10z
+    M90 0V20z
+    M100 0V20h10v10v-10h-10z
+    M110 5v10z
+    M120 0V30z
+  "/>
+</svg>
