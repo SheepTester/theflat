@@ -1,18 +1,22 @@
 // temp
 var test={
-  "INIT":{"type":0,"story":"hi","choices":["Die!","DIE","Win?","WIN","choice3","merp","choice4","ehh"]},
+  "INIT":{"type":0,"msg":"hi","choices":["Die!","DIE","Win?","WIN","choice3","merp","choice4","ehh"]},
   "merp":{"type":-1,"var":"mep","set":"Hi","then":"merps"},
-  "merps":{"type":1,"story":{"if":"mep","is":"Hi","then":"wow","else":"wat"},"then":"hi"},
-  "hi":{"type":1,"story":{"text":"best animal: %s a percent: %% something useless: %p and value of mep: %v","replace":["sheep","mep"]},"then":"WIN"},
+  "merps":{"type":1,"msg":{"if":"mep","is":"Hi","then":"wow","else":"wat"},"then":"hi"},
+  "hi":{"type":1,"msg":{"text":"best animal: %s a percent: %% something useless: %p and value of mep: %v","replace":["sheep","mep"]},"then":"WIN"},
   "ehh":{"type":-1,"var":"mep","set":"2","then":"eh"},
-  "eh":{"type":2,"story":"your number?","add":"mep","then":"lol"},
-  "lol":{"type":3,"story":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
-  "report":{"type":1,"story":{"text":"%v","replace":["mep"]},"then":"WIN"},
-  "DIE":"you ded",
-  "WIN":"you live"
+  "eh":{"type":2,"msg":"your number?","add":"mep","then":"lol"},
+  "lol":{"type":3,"msg":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
+  "report":{"type":1,"msg":{"text":"%v","replace":"mep"},"then":"WIN"},
+  "DIE":{"text":"you ded %i","replace":"logo.svg"},
+  "WIN":"you live less than < greater than >"
 };
 (function() {
   var story=test,values={};
+  function remove(selector) {
+    var s=document.querySelectorAll(selector);
+    for (var i=0;i<s.length;i++) s[i].parentNode.removeChild(s[i]);
+  }
   function val(varname) {
     if (values[varname]) return values[varname];
     else return '';
@@ -28,17 +32,24 @@ var test={
         if (txt.lte) return Number(val(txt.if))<=Number(text(txt.lte))?text(txt.then):text(txt.else);
         if (txt.gte) return Number(val(txt.if))>=Number(text(txt.gte))?text(txt.then):text(txt.else);
       } else if (txt.replace) {
-        var t=txt.text,r=0;
+        var t=txt.text,r=0,rr=txt.replace;
+        if (typeof rr==='string') rr=[rr];
         for (var i=0;i<t.length;) {
           i=t.indexOf('%',i);
           if (i===-1) i=t.length;
           if (t[i+1]==='s') {
-            var replace=text(txt.replace[r]);
+            var replace=text(rr[r]);
             t=t.slice(0,i)+replace+t.slice(i+2);
             i+=replace.length;
             r++;
           } else if (t[i+1]==='v') {
-            var replace=val(text(txt.replace[r]));
+            var replace=val(text(rr[r]));
+            t=t.slice(0,i)+replace+t.slice(i+2);
+            i+=replace.length;
+            r++;
+          } else if (t[i+1]==='i') {
+            var replace=text(rr[r]);
+            replace='&ilt;img src="'+replace+'" alt="'+replace+'" title="'+replace+'"/&igt;';
             t=t.slice(0,i)+replace+t.slice(i+2);
             i+=replace.length;
             r++;
@@ -51,8 +62,29 @@ var test={
       }
     }
   }
+  function bye(elem,then) {
+    var then;
+    elem.classList.add('bye');
+    setTimeout(_=>{
+      elem.parentNode.removeChild(elem);
+      if (then) then();
+    },300);
+  }
   function play(storyid) {
-    var data=story[storyid];
+    var data=story[storyid],page,msg;
+    if (data.type!==-1) {
+      page=document.createElement('page');
+      msg=document.createElement('msg');
+      msg.innerHTML=text(data.type!==undefined?data.msg:data)
+        .replace(/\&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/&amp;ilt;img/g,'<img')
+        .replace(/\/&amp;igt;/g,'/>');
+      page.appendChild(msg);
+      page.classList.add('hello');
+      setTimeout(_=>page.classList.remove('hello'),300);
+    }
     switch (data.type) {
       case -1:
         var varname=text(data.var);
@@ -64,37 +96,25 @@ var test={
         setTimeout(_=>play(text(data.then)),0);
         break;
       case 0:
-        var page=document.createElement('page'),
-        msg=document.createElement('msg');
-        msg.innerHTML=text(data.story);
-        page.appendChild(msg);
+        var choices=document.createElement('choices');
         for (var i=0;i<data.choices.length;i+=2) {
           var choice=document.createElement('choice');
           choice.innerHTML=text(data.choices[i]);
           choice.dataset.storyid=text(data.choices[i+1]);
-          choice.onclick=e=>play(e.target.dataset.storyid);
-          page.appendChild(choice);
+          choice.onclick=e=>bye(page,_=>play(e.target.dataset.storyid));
+          choices.appendChild(choice);
         }
-        document.body.appendChild(page);
+        page.appendChild(choices);
         break;
       case 1:
-        var page=document.createElement('page'),
-        msg=document.createElement('msg'),
-        cont=document.createElement('continue');
-        msg.innerHTML=text(data.story);
-        page.appendChild(msg);
+        var cont=document.createElement('continue');
         cont.innerHTML="continue";
-        cont.onclick=e=>play(text(data.then));
+        cont.onclick=e=>bye(page,_=>play(text(data.then)));;
         page.appendChild(cont);
-        document.body.appendChild(page);
         break;
       case 2:
-        var page=document.createElement('page'),
-        msg=document.createElement('msg'),
-        inp=document.createElement('input')
+        var inp=document.createElement('input')
         cont=document.createElement('continue');
-        msg.innerHTML=text(data.story);
-        page.appendChild(msg);
         inp.type='number';
         if (data.min) inp.min=text(data.min);
         if (data.max) inp.max=text(data.max);
@@ -105,18 +125,13 @@ var test={
           if (data.is) values[text(data.is)]=inp.value;
           if (data.add) values[text(data.add)]=(Number(values[text(data.add)])+Number(inp.value)).toString();
           if (data.sub) values[text(data.sub)]=(Number(values[text(data.sub)])-Number(inp.value)).toString();
-          play(text(data.then));
+          bye(page,_=>play(text(data.then)));
         };
         page.appendChild(cont);
-        document.body.appendChild(page);
         break;
       case 3:
-        var page=document.createElement('page'),
-        msg=document.createElement('msg'),
-        inp=document.createElement('input')
+        var inp=document.createElement('input')
         cont=document.createElement('continue');
-        msg.innerHTML=text(data.story);
-        page.appendChild(msg);
         inp.type='text';
         if (data.min) inp.min=text(data.min);
         if (data.max) inp.max=text(data.max);
@@ -127,20 +142,29 @@ var test={
           if (data.is) values[text(data.is)]=inp.value;
           if (data.app) values[text(data.app)]+=inp.value;
           if (data.pre) values[text(data.pre)]=inp.value+values[text(data.pre)];
-          play(text(data.then));
+          bye(page,_=>play(text(data.then)));
         };
         page.appendChild(cont);
-        document.body.appendChild(page);
         break;
       default:
-        var page=document.createElement('page'),
-        msg=document.createElement('msg');
-        msg.innerHTML=text(data);
-        page.appendChild(msg);
-        document.body.appendChild(page);
+        var cont=document.createElement('continue');
+        cont.innerHTML=storyid==='WIN'?'Celebrate':'Accept my misfortune';
+        cont.onclick=e=>bye(page,_=>{
+          document.querySelector('btns').classList.remove('hide');
+          document.querySelector('btns').classList.add('hello');
+          setTimeout(_=>document.querySelector('btns').classList.remove('hello'),300);
+        });;
+        page.appendChild(cont);
     }
+    if (page)
+      document.body.appendChild(page);
   }
   document.querySelector('#play').onclick=e=>{
-    play('INIT');
+    document.querySelector('btns').classList.add('bye');
+    setTimeout(_=>{
+      document.querySelector('btns').classList.remove('bye');
+      document.querySelector('btns').classList.add('hide');
+      play('INIT');
+    },300);
   };
 }());

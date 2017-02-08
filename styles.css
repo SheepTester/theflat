@@ -5,19 +5,107 @@ body {
   color: black;
   font-family: 'Open Sans Condensed', sans-serif;
   margin-top: 130px;
+  font-size: 20px;
+  letter-spacing: 1px;
 }
 #logo {
   height: 100px;
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  margin: 0 auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 10px auto;
+  padding: 0 10px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
-btn, choice, continue {
-  display: table;
+msg {
+  display: block;
+  margin: 10px 30px;
+  letter-spacing: initial;
+}
+btns, page {
+  display: block;
+  width: 100%;
+}
+choices {
+  display: flex;
+  margin: 0 10px;
+}
+choice {
+  display: inline-block;
+  flex-grow: 1;
+  margin: 5px;
+}
+btn, continue, choice {
   border: 2px solid black;
   padding: 5px 10px;
   cursor: pointer;
   background: white;
+  transition: background .2s cubic-bezier(0,1,1,1);
+}
+btn:active, continue:active, choice:active {
+  background: #eee;
+}
+btn {
+  font-size: 30px;
+  display: table;
+  margin: 5px auto;
+}
+continue {
+  display: table;
+  margin: 0 auto;
+}
+.hide {
+  display: none;
+}
+.bye, .hello {
+  position: fixed;
+  margin: 0 10px;
+  top: 120px;
+  width: auto;
+}
+.bye {
+  animation: bye .3s cubic-bezier(1,0,1,1);
+  right: 100%;
+}
+@keyframes bye {
+  0% {right:0;left:0;}
+  100% {right:100%;left:-100%;}
+}
+.hello {
+  animation: hello .3s cubic-bezier(0,1,1,1);
+  left: 0;
+}
+@keyframes hello {
+  0% {left:100%;right:-100%;}
+  100% {left:0;right:0;}
+}
+btns.bye, btns.hello {
+  top: 125px;
+}
+input {
+  border: 2px solid black;
+  background: white;
+  width: 50%;
+  padding: 5px;
+  text-align: center;
+  display: block;
+  margin: 5px auto;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+page msg img {
+  max-height: 300px;
+  max-width: 100%;
+}
+@media (max-width:460px) {
+  btn {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
 }
