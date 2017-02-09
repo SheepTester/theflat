@@ -8,5 +8,5 @@
   "lol":{"type":3,"msg":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
   "report":{"type":1,"msg":{"text":"%v","replace":"mep"},"then":"WIN"},
   "DIE":{"text":"you ded %i","replace":"logo.svg"},
-  "WIN":"you live less than < greater than >"
+  "WIN":{"text":"you live less than < greater than >\nlol%hlol","replace":"wow"}
 }

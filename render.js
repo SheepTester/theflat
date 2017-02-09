@@ -9,10 +9,62 @@ var test={
   "lol":{"type":3,"msg":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
   "report":{"type":1,"msg":{"text":"%v","replace":"mep"},"then":"WIN"},
   "DIE":{"text":"you ded %i","replace":"logo.svg"},
-  "WIN":"you live less than < greater than >"
+  "WIN":{"text":"you live less than < greater than >\nlol%hlol","replace":"wow"}
 };
+// test={
+//   INIT:{type:-1,var:'t',rand:'2',then:{if:'t',is:'0',then:'DIE',else:'WIN'}},
+//   WIN:'yay',
+//   DIE:'noo'
+// };
+function encode(str) {
+  var r='';
+  for (var i=0;i<str.length;i++) {
+    var ascii=str.charCodeAt(i);
+    if (ascii<32) ascii=0;
+    else ascii-=31;
+    r+=ascii.toString(16)+'g';
+  }
+  return r.slice(0,-1);
+}
+function decode(str) {
+  var r='';
+  str=str.split('g').map(a=>parseInt(a,16));
+  for (var i=0;i<str.length;i++) {
+    if (str[i]===0) r+='\n';
+    else r+=String.fromCharCode(str[i]+31);
+  }
+  return r;
+}
 (function() {
-  var story=test,values={};
+  var story=test,values,history;
+  function Confetti(x,y) {
+    this.x=x;
+    this.y=y;
+    this.box=document.createElement('confetti');
+    this.size=Math.random()*10+5;
+    this.color=Math.floor(Math.random()*360);
+    this.tilt=Math.random()*360;
+    this.box.style.left=this.x+'px';
+    this.box.style.top=this.y+'px';
+    this.box.style.transform='rotate('+this.tilt+'deg)';
+    this.box.style.boxShadow='0 0 0 '+this.size+'px hsl('+this.color+',100%,50%)';
+    document.querySelector('confettis').appendChild(this.box);
+    this.xv=Math.random()*10-5;
+    this.yv=Math.random()*-20-10;
+    this.interval=setInterval(_=>{
+      this.x+=this.xv;
+      this.tilt+=this.xv;
+      this.y+=this.yv;
+      this.yv+=1;
+      this.box.style.left=this.x+'px';
+      this.box.style.top=this.y+'px';
+      this.box.style.transform='rotate('+this.tilt+'deg)';
+      if (this.y>window.innerHeight) {
+        clearInterval(this.interval);
+        document.querySelector('confettis').removeChild(this.box)
+      }
+    },30);
+  }
   function remove(selector) {
     var s=document.querySelectorAll(selector);
     for (var i=0;i<s.length;i++) s[i].parentNode.removeChild(s[i]);
@@ -53,6 +105,12 @@ var test={
             t=t.slice(0,i)+replace+t.slice(i+2);
             i+=replace.length;
             r++;
+          } else if (t[i+1]==='h') {
+            var replace=text(rr[r]);
+            replace='&hlt;'+replace+'&hgt;';
+            t=t.slice(0,i)+replace+t.slice(i+2);
+            i+=replace.length;
+            r++;
           } else if (t[i+1]==='%') {
             t=t.slice(0,i)+t.slice(i+1);
             i++;
@@ -64,6 +122,7 @@ var test={
   }
   function bye(elem,then) {
     var then;
+    document.onkeydown=null;
     elem.classList.add('bye');
     setTimeout(_=>{
       elem.parentNode.removeChild(elem);
@@ -73,6 +132,7 @@ var test={
   function play(storyid) {
     var data=story[storyid],page,msg;
     if (data.type!==-1) {
+      history.push(storyid);
       page=document.createElement('page');
       msg=document.createElement('msg');
       msg.innerHTML=text(data.type!==undefined?data.msg:data)
@@ -80,7 +140,10 @@ var test={
         .replace(/</g,'&lt;')
         .replace(/>/g,'&gt;')
         .replace(/&amp;ilt;img/g,'<img')
-        .replace(/\/&amp;igt;/g,'/>');
+        .replace(/\/&amp;igt;/g,'/>')
+        .replace(/&amp;hlt;/g,'<h>')
+        .replace(/&amp;hgt;/g,'</h>')
+        .replace(/\r?\n/g,'<br>');
       page.appendChild(msg);
       page.classList.add('hello');
       setTimeout(_=>page.classList.remove('hello'),300);
@@ -93,6 +156,7 @@ var test={
         else if (data.sub) values[varname]=(Number(values[varname])-Number(text(data.sub))).toString();
         else if (data.app) values[varname]+=text(data.app);
         else if (data.pre) values[varname]=text(data.pre)+values[varname];
+        else if (data.rand) values[varname]=Math.floor(Math.random()*Number(text(data.rand))).toString();
         setTimeout(_=>play(text(data.then)),0);
         break;
       case 0:
@@ -104,12 +168,17 @@ var test={
           choice.onclick=e=>bye(page,_=>play(e.target.dataset.storyid));
           choices.appendChild(choice);
         }
+        if (data.choices.length<10)
+          document.onkeydown=e=>{
+            if (e.keyCode>48&&e.keyCode<58) choices.children[e.keyCode-49].click();
+          };
         page.appendChild(choices);
         break;
       case 1:
         var cont=document.createElement('continue');
         cont.innerHTML="continue";
-        cont.onclick=e=>bye(page,_=>play(text(data.then)));;
+        cont.onclick=e=>bye(page,_=>play(text(data.then)));
+        document.onkeydown=e=>{if (e.keyCode===13) cont.click();};
         page.appendChild(cont);
         break;
       case 2:
@@ -120,6 +189,7 @@ var test={
         if (data.max) inp.max=text(data.max);
         if (data.step) inp.step=text(data.step);
         page.appendChild(inp);
+        setTimeout(_=>inp.focus(),0);
         cont.innerHTML="ok";
         cont.onclick=e=>{
           if (data.is) values[text(data.is)]=inp.value;
@@ -127,6 +197,7 @@ var test={
           if (data.sub) values[text(data.sub)]=(Number(values[text(data.sub)])-Number(inp.value)).toString();
           bye(page,_=>play(text(data.then)));
         };
+        document.onkeydown=e=>{if (e.keyCode===13) cont.click();};
         page.appendChild(cont);
         break;
       case 3:
@@ -137,6 +208,7 @@ var test={
         if (data.max) inp.max=text(data.max);
         if (data.step) inp.step=text(data.step);
         page.appendChild(inp);
+        setTimeout(_=>inp.focus(),0);
         cont.innerHTML="ok";
         cont.onclick=e=>{
           if (data.is) values[text(data.is)]=inp.value;
@@ -144,16 +216,24 @@ var test={
           if (data.pre) values[text(data.pre)]=inp.value+values[text(data.pre)];
           bye(page,_=>play(text(data.then)));
         };
+        document.onkeydown=e=>{if (e.keyCode===13) cont.click();};
         page.appendChild(cont);
         break;
       default:
         var cont=document.createElement('continue');
         cont.innerHTML=storyid==='WIN'?'Celebrate':'Accept my misfortune';
+        document.querySelector('bar').className=storyid==='WIN'?'win':'die';
+        if (storyid==='WIN') {
+          var interval=setInterval(_=>new Confetti(window.innerWidth/2,window.innerHeight),30);
+          setTimeout(_=>clearInterval(interval),500);
+        }
         cont.onclick=e=>bye(page,_=>{
           document.querySelector('btns').classList.remove('hide');
           document.querySelector('btns').classList.add('hello');
+          document.querySelector('bar').className='';
           setTimeout(_=>document.querySelector('btns').classList.remove('hello'),300);
-        });;
+        });
+        document.onkeydown=e=>{if (e.keyCode===13) cont.click();};
         page.appendChild(cont);
     }
     if (page)
@@ -164,6 +244,8 @@ var test={
     setTimeout(_=>{
       document.querySelector('btns').classList.remove('bye');
       document.querySelector('btns').classList.add('hide');
+      values={};
+      history=[];
       play('INIT');
     },300);
   };

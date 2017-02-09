@@ -23,6 +23,7 @@ msg {
   display: block;
   margin: 10px 30px;
   letter-spacing: initial;
+  color: #4a3a3a;
 }
 btns, page {
   display: block;
@@ -31,26 +32,32 @@ btns, page {
 choices {
   display: flex;
   margin: 0 10px;
+  flex-wrap: wrap;
 }
 choice {
   display: inline-block;
   flex-grow: 1;
   margin: 5px;
+  flex-basis: 0;
 }
-btn, continue, choice {
+btns btn, continue, choice {
   border: 2px solid black;
   padding: 5px 10px;
   cursor: pointer;
   background: white;
   transition: background .2s cubic-bezier(0,1,1,1);
 }
-btn:active, continue:active, choice:active {
+btns btn:active, continue:active, choice:active {
   background: #eee;
 }
-btn {
+btns btn {
   font-size: 30px;
   display: table;
   margin: 5px auto;
+}
+btns btn.disabled {
+  cursor: default;
+  background: #ddd;
 }
 continue {
   display: table;
@@ -102,10 +109,94 @@ page msg img {
   max-height: 300px;
   max-width: 100%;
 }
+left, right {
+  display: block;
+  position: fixed;
+  bottom: 5px;
+  color: #4a3a3a;
+  font-size: 0;
+  margin: 5px;
+  transition: bottom .5s;
+}
+left {
+  left: 0;
+}
+right {
+  right: 90px;
+}
+left btn, right btn {
+  display: inline-block;
+  font-size: 20px;
+  height: 20px;
+  margin: 5px;
+  line-height: 1;
+  cursor: pointer;
+}
+left btn:hover, right btn:hover {
+  margin-bottom: 4px;
+  border-bottom: 1px solid #4a3a3a;
+}
+h {
+  display: block;
+  font-size: 30px;
+}
+bar {
+  position: fixed;
+  z-index: -1;
+  bottom: 0;
+  background: #3398d7;
+  width: 100%;
+  left: 0;
+  height: 5px;
+  transition: height .5s, background .5s;
+}
+bar.die, bar.win {
+  z-index: 1001;
+  height: 15px;
+}
+bar.die {
+  background: #d73333;
+  animation: die 1s cubic-bezier(1,0,0,1), pulsate .3s linear 1s infinite alternate;
+}
+@keyframes die {
+  0% {height: 5px;}
+  40% {height: 100%;opacity: 1;}
+  80% {opacity: 0;height: 100%;}
+  81% {opacity: 1;height: 0;}
+  100% {height: 15px;}
+}
+@keyframes pulsate {
+  from {background: #d73333;}
+  to {background: #e26e6e;}
+}
+bar.win {
+  background: #8cd733;
+  animation: win .3s linear infinite alternate;
+}
+@keyframes win {
+  from {background: #8cd733;}
+  to {background: #aee26e;}
+}
+left.winlose, right.winlose {
+  bottom: 20px;
+}
+confettis {
+  position: absolute;
+}
+confetti {
+  display: block;
+  position: fixed;
+  height: 0;
+  width: 0;
+}
 @media (max-width:460px) {
-  btn {
+  btns btn {
     width: 100%;
     box-sizing: border-box;
     text-align: center;
+  }
+  input {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
