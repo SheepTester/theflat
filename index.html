@@ -10,16 +10,23 @@
   <body>
     <img src="flat.svg" alt="The Flat" id='logo'>
     <btns>
-      <btn id='play'>Continue</btn>
-      <btn id='load' class='disabled'>Play</btn>
+      <btn id='play' class='disabled'>Continue</btn>
+      <btn id='load'>Play</btn>
       <btn class='disabled'>Credits</btn>
     </btns>
+    <levelcontainer class='hide'>
+      <input type="text" placeholder="JSON URL here" id='jsonurl'/><add></add>
+      <levels>
+        <level data-src="https://gist.githubusercontent.com/SheepTester/c9b14936537210124e756ae5acf8b8b6/raw/eb3c714e0ffd225702a9737f2302afb8e54a4d8a/random_theflat.json">Random</level>
+        <level data-src="https://sheeptester.github.io/theflat/test.json">The test level I used to test the Flat</level>
+      </levels>
+    </levelcontainer>
     <left>
       <btn>oops</btn>
       <btn>save</btn>
     </left>
     <right>
-      <btn>home</btn>
+      <btn id='menu'>home</btn>
     </right>
     <bar></bar>
     <confettis></confettis>

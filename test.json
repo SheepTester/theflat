@@ -1,4 +1,5 @@
 {
+  "META":{"name":"The test level I used to test the Flat","by":"Sean"},
   "INIT":{"type":0,"msg":"hi","choices":["Die!","DIE","Win?","WIN","choice3","merp","choice4","ehh"]},
   "merp":{"type":-1,"var":"mep","set":"Hi","then":"merps"},
   "merps":{"type":1,"msg":{"if":"mep","is":"Hi","then":"wow","else":"wat"},"then":"hi"},

@@ -1,21 +1,4 @@
 // temp
-var test={
-  "INIT":{"type":0,"msg":"hi","choices":["Die!","DIE","Win?","WIN","choice3","merp","choice4","ehh"]},
-  "merp":{"type":-1,"var":"mep","set":"Hi","then":"merps"},
-  "merps":{"type":1,"msg":{"if":"mep","is":"Hi","then":"wow","else":"wat"},"then":"hi"},
-  "hi":{"type":1,"msg":{"text":"best animal: %s a percent: %% something useless: %p and value of mep: %v","replace":["sheep","mep"]},"then":"WIN"},
-  "ehh":{"type":-1,"var":"mep","set":"2","then":"eh"},
-  "eh":{"type":2,"msg":"your number?","add":"mep","then":"lol"},
-  "lol":{"type":3,"msg":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
-  "report":{"type":1,"msg":{"text":"%v","replace":"mep"},"then":"WIN"},
-  "DIE":{"text":"you ded %i","replace":"logo.svg"},
-  "WIN":{"text":"you live less than < greater than >\nlol%hlol","replace":"wow"}
-};
-// test={
-//   INIT:{type:-1,var:'t',rand:'2',then:{if:'t',is:'0',then:'DIE',else:'WIN'}},
-//   WIN:'yay',
-//   DIE:'noo'
-// };
 function encode(str) {
   var r='';
   for (var i=0;i<str.length;i++) {
@@ -36,7 +19,17 @@ function decode(str) {
   return r;
 }
 (function() {
-  var story=test,values,history;
+  var story,values,history;
+  function save(thing,to) {
+    var to,saves;
+    if (localStorage.flatlevels) saves=JSON.parse(localStorage.flatlevels);
+    else saves={};
+    if (to) {
+      saves[thing]=to;
+      localStorage.flatlevels=JSON.stringify(saves);
+    }
+    else return saves[thing];
+  }
   function Confetti(x,y) {
     this.x=x;
     this.y=y;
@@ -240,13 +233,71 @@ function decode(str) {
       document.body.appendChild(page);
   }
   document.querySelector('#play').onclick=e=>{
+    return true; // disabled continue for now
     document.querySelector('btns').classList.add('bye');
     setTimeout(_=>{
       document.querySelector('btns').classList.remove('bye');
       document.querySelector('btns').classList.add('hide');
+      document.querySelector('left').className='playing';
       values={};
       history=[];
+      // story=null;
       play('INIT');
     },300);
+  };
+  document.querySelector('levels').onclick=e=>{
+    if (e.target.tagName==='LEVEL')
+      SHEEP.ajax(e.target.dataset.src,e=>{
+        document.querySelector('levelcontainer').classList.add('bye');
+        setTimeout(_=>{
+          document.querySelector('levelcontainer').classList.remove('bye');
+          document.querySelector('levelcontainer').classList.add('hide');
+          document.querySelector('left').className='playing';
+          values={};
+          history=[];
+          story=JSON.parse(e);
+          play('INIT');
+        },300);
+      });
+  };
+  document.querySelector('add').onclick=e=>{
+    if (document.querySelector('#jsonurl').value) {
+      var s=document.createElement('level');
+      s.dataset.src=document.querySelector('#jsonurl').value;
+      s.textContent='sorry names are not implemented yet screw you';
+      document.querySelector('levels').appendChild(s);
+      document.querySelector('#jsonurl').value='';
+    }
+  };
+  document.querySelector('#jsonurl').onkeydown=e=>{
+    if (e.keyCode===13) document.querySelector('add').click();
+  };
+  document.querySelector('#load').onclick=e=>{
+    document.querySelector('btns').classList.add('bye');
+    setTimeout(_=>{
+      document.querySelector('btns').classList.remove('bye');
+      document.querySelector('btns').classList.add('hide');
+      document.querySelector('levelcontainer').classList.remove('hide');
+      document.querySelector('levelcontainer').classList.add('hello');
+      setTimeout(_=>document.querySelector('levelcontainer').classList.remove('hello'),300);
+    },300);
+  };
+  document.querySelector('#menu').onclick=e=>{
+    if (!document.querySelector('btns').classList.contains('hide')||document.querySelector('.bye')||document.querySelector('.hello')) return true;
+    var t,elm;
+    if (document.querySelector('page')) {t='p';elm=document.querySelector('page');}
+    else if (!document.querySelector('levelcontainer').classList.contains('hide')) {t='l';elm=document.querySelector('levelcontainer');}
+    elm.classList.add('bye');
+    setTimeout(_=>{
+      if (t=='p') document.querySelector('page').parentNode.removeChild(document.querySelector('page'));
+      else {
+        elm.classList.remove('bye');
+        elm.classList.add('hide');
+      }
+      document.querySelector('btns').classList.remove('hide');
+      document.querySelector('btns').classList.add('hello');
+      setTimeout(_=>document.querySelector('btns').classList.remove('hello'),300);
+    },300);
+    document.querySelector('left').className='';
   };
 }());
