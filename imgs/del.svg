@@ -1,0 +1,3 @@
+<svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <path fill="none" stroke='black' stroke-width='2' stroke-linejoin='round' d="M10 10H40M25 10v-2v2M15 15V40H35V15"/>
+</svg>

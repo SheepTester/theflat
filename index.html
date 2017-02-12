@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <img src="flat.svg" alt="The Flat" id='logo'>
+    <img src="imgs/flat.svg" alt="The Flat" id='logo'>
     <btns>
       <btn id='play' class='disabled'>Continue</btn>
       <btn id='load'>Play</btn>
@@ -16,14 +16,17 @@
     </btns>
     <levelcontainer class='hide'>
       <input type="text" placeholder="JSON URL here" id='jsonurl'/><add></add>
-      <levels>
-        <level data-src="https://gist.githubusercontent.com/SheepTester/c9b14936537210124e756ae5acf8b8b6/raw/eb3c714e0ffd225702a9737f2302afb8e54a4d8a/random_theflat.json">Random</level>
-        <level data-src="https://sheeptester.github.io/theflat/test.json">The test level I used to test the Flat</level>
-      </levels>
+      <levels></levels>
     </levelcontainer>
+    <editr class='hide'>
+      <input type="text" placeholder="Source JSON" id='src'/>
+      <input type="text" placeholder="Save code" id='savecode'/>
+      <actions><restart title="Restart level progress."></restart><copy title="Make a copy of this level with the same save code."></copy><delete title="Delete this level."></delete></actions>
+    </editr>
     <left>
       <btn>oops</btn>
-      <btn>save</btn>
+      <btn id='savi'>save</btn>
+      <btn id='lvls'>whoops i didn't mean to click the edit button</btn>
     </left>
     <right>
       <btn id='menu'>home</btn>

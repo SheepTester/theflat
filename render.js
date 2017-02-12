@@ -19,16 +19,71 @@ function decode(str) {
   return r;
 }
 (function() {
-  var story,values,history;
-  function save(thing,to) {
-    var to,saves;
-    if (localStorage.flatlevels) saves=JSON.parse(localStorage.flatlevels);
-    else saves={};
-    if (to) {
-      saves[thing]=to;
-      localStorage.flatlevels=JSON.stringify(saves);
+  var story,values,history,saves,storydata={},currentstoryid;
+  if (localStorage.flatlevels) {
+    saves=JSON.parse(localStorage.flatlevels);
+  } else {
+    saves=[0,"STORYSRC`https://sheeptester.github.io/theflat/test.json`STORYID`INIT`"];
+    localStorage.flatlevels=JSON.stringify(saves);
+  }
+  for (var i=1;i<saves.length;i++) {
+    var s=document.createElement('level');
+    s.dataset.id=i;
+    s.appendChild(document.createElement('edit'));
+    document.querySelector('levels').appendChild(s);
+    saves[i]=read(saves[i],i);
+  }
+  for (var span in storydata) {
+    (span=>SHEEP.ajax(span,e=>{
+      var burpers=storydata[span].split('-').slice(0,-1);
+      storydata[span]=JSON.parse(e);
+      for (var i=0;i<burpers.length;i++) {
+        document.querySelector('level[data-id="'+burpers[i]+'"]').appendChild(document.createTextNode(storydata[span].META.name));
+      }
+    }))(span);
+  }
+  if (saves[0]!==0) document.querySelector('#play').classList.remove('disabled');
+  function savecodas(laobject) {
+    var konvertigxis='';
+    for (var span in laobject) {
+      if (/[`\|]/.test(span)) konvertigxis+=encode(span)+'|';
+      else konvertigxis+=span+'`';
+      if (/[`\|]/.test(laobject[span])) konvertigxis+=encode(laobject[span])+'|';
+      else konvertigxis+=laobject[span]+'`';
     }
-    else return saves[thing];
+    return konvertigxis;
+  }
+  function read(savecode,i) {
+    var t={};
+    for (var j=1;j<savecode.length;j++) {
+      var k,l;
+      if (savecode.indexOf('`',j)===-1) k=savecode.indexOf('|',j);
+      else if (savecode.indexOf('|',j)===-1) k=savecode.indexOf('`',j);
+      else if (savecode.indexOf('`',j)>savecode.indexOf('|',j)) k=savecode.indexOf('|',j);
+      else k=savecode.indexOf('`',j);
+      if (k===-1) break;
+      if (savecode[k]==='`') l=savecode.slice(j-1,k);
+      else l=decode(savecode.slice(j-1,k));
+      j=k+1;
+      if (savecode.indexOf('`',j)===-1) k=savecode.indexOf('|',j);
+      else if (savecode.indexOf('|',j)===-1) k=savecode.indexOf('`',j);
+      else if (savecode.indexOf('`',j)>savecode.indexOf('|',j)) k=savecode.indexOf('|',j);
+      else k=savecode.indexOf('`',j);
+      if (k===-1) break;
+      if (savecode[k]==='`') t[l]=savecode.slice(j,k);
+      else t[l]=decode(savecode.slice(j,k));
+      j=k+1;
+    }
+    if (!storydata[t.STORYSRC]) storydata[t.STORYSRC]='';
+    if (typeof storydata[t.STORYSRC]==='string') storydata[t.STORYSRC]+=i+'-';
+    return t;
+  }
+  function save(savearray) {
+    if (saves[0]!==0) document.querySelector('#play').classList.remove('disabled');
+    else document.querySelector('#play').classList.add('disabled');
+    var t=[savearray[0]];
+    for (var i=1;i<savearray.length;i++) t[i]=savecodas(savearray[i]);
+    return JSON.stringify(t);
   }
   function Confetti(x,y) {
     this.x=x;
@@ -124,6 +179,7 @@ function decode(str) {
   }
   function play(storyid) {
     var data=story[storyid],page,msg;
+    currentstoryid=storyid;
     if (data.type!==-1) {
       history.push(storyid);
       page=document.createElement('page');
@@ -233,39 +289,59 @@ function decode(str) {
       document.body.appendChild(page);
   }
   document.querySelector('#play').onclick=e=>{
-    return true; // disabled continue for now
+    if (document.querySelector('#play').classList.contains('disabled')) return true; // disabled continue for now
     document.querySelector('btns').classList.add('bye');
     setTimeout(_=>{
       document.querySelector('btns').classList.remove('bye');
       document.querySelector('btns').classList.add('hide');
       document.querySelector('left').className='playing';
-      values={};
+      values=saves[saves[0]];
       history=[];
-      // story=null;
-      play('INIT');
+      story=storydata[values.STORYSRC];
+      play(values.STORYID);
     },300);
   };
   document.querySelector('levels').onclick=e=>{
-    if (e.target.tagName==='LEVEL')
-      SHEEP.ajax(e.target.dataset.src,e=>{
-        document.querySelector('levelcontainer').classList.add('bye');
-        setTimeout(_=>{
-          document.querySelector('levelcontainer').classList.remove('bye');
-          document.querySelector('levelcontainer').classList.add('hide');
-          document.querySelector('left').className='playing';
-          values={};
-          history=[];
-          story=JSON.parse(e);
-          play('INIT');
-        },300);
-      });
+    if (e.target.tagName==='LEVEL') {
+      document.querySelector('levelcontainer').classList.add('bye');
+      setTimeout(_=>{
+        document.querySelector('levelcontainer').classList.remove('bye');
+        document.querySelector('levelcontainer').classList.add('hide');
+        document.querySelector('left').className='playing';
+        saves[0]=Number(e.target.dataset.id);
+        values=saves[saves[0]];
+        history=[];
+        story=storydata[values.STORYSRC];
+        play(values.STORYID);
+      },300);
+    } else if (e.target.tagName==='EDIT') {
+      document.querySelector('levelcontainer').classList.add('bye');
+      setTimeout(_=>{
+        document.querySelector('levelcontainer').classList.remove('bye');
+        document.querySelector('levelcontainer').classList.add('hide');
+        document.querySelector('editr').classList.remove('hide');
+        document.querySelector('editr').classList.add('hello');
+        setTimeout(_=>document.querySelector('editr').classList.remove('hello'),300);
+        document.querySelector('editr').dataset.id=e.target.parentNode.dataset.id;
+        document.querySelector('left').className='editing';
+        document.querySelector('#src').value=saves[Number(e.target.parentNode.dataset.id)].STORYSRC;
+        document.querySelector('#savecode').value=savecodas(saves[Number(e.target.parentNode.dataset.id)]);
+      },300);
+    }
   };
   document.querySelector('add').onclick=e=>{
     if (document.querySelector('#jsonurl').value) {
-      var s=document.createElement('level');
-      s.dataset.src=document.querySelector('#jsonurl').value;
-      s.textContent='sorry names are not implemented yet screw you';
+      var s=document.createElement('level'),src=document.querySelector('#jsonurl').value;
+      s.dataset.id=saves.length;
+      s.appendChild(document.createElement('edit'));
       document.querySelector('levels').appendChild(s);
+      saves.push({STORYID:'INIT',STORYSRC:src});
+      if (!storydata[src]) SHEEP.ajax(src,e=>{
+        storydata[src]=JSON.parse(e);
+        s.appendChild(document.createTextNode(storydata[src].META.name));
+      });
+      else s.appendChild(document.createTextNode(storydata[src].META.name));
+      localStorage.flatlevels=save(saves);
       document.querySelector('#jsonurl').value='';
     }
   };
@@ -287,6 +363,7 @@ function decode(str) {
     var t,elm;
     if (document.querySelector('page')) {t='p';elm=document.querySelector('page');}
     else if (!document.querySelector('levelcontainer').classList.contains('hide')) {t='l';elm=document.querySelector('levelcontainer');}
+    else if (!document.querySelector('editr').classList.contains('hide')) {t='e';elm=document.querySelector('editr');}
     elm.classList.add('bye');
     setTimeout(_=>{
       if (t=='p') document.querySelector('page').parentNode.removeChild(document.querySelector('page'));
@@ -299,5 +376,39 @@ function decode(str) {
       setTimeout(_=>document.querySelector('btns').classList.remove('hello'),300);
     },300);
     document.querySelector('left').className='';
+  };
+  document.querySelector('#savi').onclick=e=>{
+    saves[saves[0]].STORYID=currentstoryid;
+    if (currentstoryid=='WIN'||currentstoryid=='DIE') {
+      saves[0]=0;
+    }
+    localStorage.flatlevels=save(saves);
+  };
+  document.querySelector('restart').onclick=e=>{
+    var t=Number(document.querySelector('editr').dataset.id);
+    saves[t]={STORYID:'INIT',STORYSRC:saves[t].STORYSRC};
+    if (saves[0]===t) saves[0]=0;
+    document.querySelector('#savecode').value=savecodas(saves[t]);
+  };
+  document.querySelector('copy').onclick=e=>{
+    var s=document.createElement('level'),src=document.querySelector('#src').value;
+    s.dataset.id=saves.length;
+    s.appendChild(document.createElement('edit'));
+    s.appendChild(document.createTextNode(storydata[src].META.name));
+    document.querySelector('levels').appendChild(s);
+    saves.push(saves[Number(document.querySelector('editr').dataset.id)]);
+    localStorage.flatlevels=save(saves);
+    document.querySelector('#lvls').click();
+  };
+  document.querySelector('#lvls').onclick=e=>{
+    document.querySelector('editr').classList.add('bye');
+    document.querySelector('left').classList.remove('editing');
+    setTimeout(_=>{
+      document.querySelector('editr').classList.remove('bye');
+      document.querySelector('editr').classList.add('hide');
+      document.querySelector('levelcontainer').classList.remove('hide');
+      document.querySelector('levelcontainer').classList.add('hello');
+      setTimeout(_=>document.querySelector('levelcontainer').classList.remove('hello'),300);
+    },300);
   };
 }());

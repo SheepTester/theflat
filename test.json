@@ -8,6 +8,6 @@
   "eh":{"type":2,"msg":"your number?","add":"mep","then":"lol"},
   "lol":{"type":3,"msg":{"text":"your number + 2 is %v","replace":["mep"]},"pre":"mep","then":"report"},
   "report":{"type":1,"msg":{"text":"%v","replace":"mep"},"then":"WIN"},
-  "DIE":{"text":"you ded %i","replace":"logo.svg"},
+  "DIE":{"text":"you ded %i","replace":"imgs/logo.svg"},
   "WIN":{"text":"you live less than < greater than >\nlol%hlol","replace":"wow"}
 }

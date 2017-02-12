@@ -1,0 +1,6 @@
+{
+  "storyid_1":{"type":-1,"var":"var","is":"val","then":"nextstoryid"},
+  "storyid1":{"msg":"message","type":1,"then":"nextstoryid"},
+  "storyid2":{"msg":"message","is":"var","type":2,"then":"nextstoryid"},
+  "storyid3":{"msg":"message","is":"var","type":3,"then":"nextstoryid"}
+}

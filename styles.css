@@ -56,7 +56,14 @@ btns btn, continue, choice {
   background: white;
   transition: background .2s cubic-bezier(0,1,1,1);
 }
-btns btn:active, continue:active, choice:active, add:active {
+btns btn:active,
+continue:active,
+choice:active,
+add:active,
+edit:active,
+restart:active,
+copy:active,
+delete:active {
   background-color: #eee;
 }
 btns btn {
@@ -81,6 +88,7 @@ continue {
   top: 130px;
   width: auto;
   bottom: 40px;
+  pointer-events: none;
 }
 .bye {
   animation: bye .3s cubic-bezier(1,0,1,1);
@@ -152,6 +160,9 @@ left btn {
   display: none;
 }
 left.playing btn:first-child, left.playing btn:nth-child(2) {
+  display: inline-block;
+}
+left.editing btn:nth-child(3) {
   display: inline-block;
 }
 h {
@@ -252,7 +263,7 @@ levelcontainer input {
 add {
   display: inline-block;
   background-color: white;
-  background-image: url('plus.svg');
+  background-image: url('imgs/plus.svg');
   background-size: 30px;
   background-position: center;
   background-repeat: no-repeat;
@@ -268,16 +279,86 @@ add {
   cursor: pointer;
   transition: background .2s cubic-bezier(0,1,1,1);
 }
+edit {
+  display: inline-block;
+  background-color: white;
+  background-image: url('imgs/edit.svg');
+  background-size: 30px;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  box-sizing: border-box;
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+  cursor: pointer;
+  transition: background .2s cubic-bezier(0,1,1,1);
+}
 level {
   display: block;
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
   cursor: pointer;
+  height: 40px;
+  line-height: 1;
+  position: relative;
 }
 level:nth-child(odd) {
   background-color: rgba(0,0,0,0.05);
 }
+editr {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 30px;
+  border: 2px solid black;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.2);
+}
+editr.hello, editr.bye {
+  margin: 0 40px;
+}
+editr input {
+  width: calc(100% - 60px);
+  display: table;
+  margin: 30px;
+  border: 2px solid black;
+  box-sizing: border-box;
+  padding: 5px;
+  height: 40px;
+  line-height: 1;
+}
+actions {
+  display: flex;
+  position: absolute;
+  top: 160px;
+  bottom: 30px;
+  left: 20px;
+  right: 20px;
+}
+restart, copy, delete {
+  flex-grow: 1;
+  flex-basis: 0;
+  border: 2px solid black;
+  background: white;
+  display: block;
+  margin: 10px;
+  height: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: background .2s cubic-bezier(0,1,1,1);
+}
+restart {background-image: url('imgs/again.svg');}
+copy {background-image: url('imgs/copy.svg');}
+delete {background-image: url('imgs/del.svg');}
 @media (max-width:460px) {
   btns btn {
     width: 100%;
