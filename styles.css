@@ -310,6 +310,9 @@ level {
 level:nth-child(odd) {
   background-color: rgba(0,0,0,0.05);
 }
+level.fail {
+  background-color: rgba(255,0,0,0.1);
+}
 editr {
   position: absolute;
   top: 0;
